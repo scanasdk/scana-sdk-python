@@ -2,7 +2,7 @@
 import requests
 import hashlib
 import time
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import urlparse, parse_qsl, parse_qs
 
 
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/#creating-the-package-files
@@ -154,24 +154,32 @@ class ModerateClient(object):
         buff += self.secret_key
         return hashlib.md5(buff.encode('utf8')).hexdigest()
 
-    def gen_signature_by_url(self, url):
+    def validate_signature_by_url(self, url):
         """生成签名信息
         Args: params url 回调地址
         Returns: 参数签名md5值
         """
         query_dict = parse_qs(urlparse(url).query)
-        business_id = query_dict.get('businessId', [])
-        nonce = query_dict.get('nonce', '')
-        timestamp = query_dict.get('timestamp', '')
-        if not any([business_id, nonce, timestamp]):
-            print('从query获取参数失败')
-            return ''
-        business_id = business_id[0]
-        nonce = nonce[0]
+        business_id = query_dict.get('businessId', '[]')
+        nonce = query_dict.get('nonce', [])
+        timestamp = query_dict.get('timestamp', [])
+        appId = query_dict.get('appId', [])
+        signature = query_dict.get('signature', [])
+        if not any([business_id, nonce, timestamp, signature, appId]):
+            print('请检查query是否完整，或nonce的值是否为0')
+            return False
         timestamp = timestamp[0]
-        params = {"nonce": nonce, "timestamp": timestamp, 'businessId': business_id}
+        if timestamp - int(time.time()) > 300:
+            print('超时了')
+            return False
+        signature = signature[0]
+        params = {}
+        query_dict = parse_qsl(urlparse(url).query)
+        [params.update({item[0]: item[1]}) for item in query_dict]
+        del params['signature']
         buff = ""
         for k in sorted(params.keys()):
             buff += str(k) + str(params[k])
         buff += self.secret_key
-        return hashlib.md5(buff.encode('utf8')).hexdigest()
+        result = hashlib.md5(buff.encode('utf8')).hexdigest()
+        return result == signature

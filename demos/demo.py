@@ -15,8 +15,8 @@ def gen_sign_by_url(url):
                         secret_key=secret_key,  # 得到的秘钥
                         doc_business_id=doc_business_id)  # 文档的业务id
 
-    sign = mc.gen_signature_by_url(url)
-    return sign
+    result = mc.validate_signature_by_url(url)
+    return result
 
 
 def gen_sign(business_id, timestamp, nonce):
@@ -119,23 +119,20 @@ def doc_test():
 
 
 if __name__ == "__main__":
-    # business_id, timestamp, nonce = '111111111', 1611111111111, 1
-    # print(gen_sign(business_id, timestamp, nonce))
-    #
-    #
-    # url = 'https://xxxx.xxx?businessId=111111111&nonce=1&timestamp=1611111111111'
-    # print(gen_sign_by_url(url))
-    # pass
-    mc = ModerateClient(img_business_id='1800097935845781514', secret_key='a2f175a8-5373-11ed-9949-0242ac12000e',
-                        app_id='62ac786311b92177337a933b'
-                        )
-    content = [
-        {
-            "contentId": "测试回调",
-            "data": "https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png",  # 图片链接
-            "type": 1  # 调用类型，1图片url，2图片base64
-        }
 
-    ]
-    res = mc.image(content=content, extra='123')
-    print(res)
+    url = 'https://xxxx.xxx?businessId=111111111&nonce=1&timestamp=1611111111111&signature=xxxxxxx'
+    print(gen_sign_by_url(url))
+    # pass
+    # mc = ModerateClient(img_business_id='1800097935845781514', secret_key='a2f175a8-5373-11ed-9949-0242ac12000e',
+    #                     app_id='62ac786311b92177337a933b'
+    #                     )
+    # content = [
+    #     {
+    #         "contentId": "测试回调",
+    #         "data": "https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png",  # 图片链接
+    #         "type": 1  # 调用类型，1图片url，2图片base64
+    #     }
+    #
+    # ]
+    # res = mc.image(content=content, extra='123')
+    # print(res)
