@@ -166,10 +166,10 @@ class ModerateClient(object):
         appId = query_dict.get('appId', [])
         signature = query_dict.get('signature', [])
         if not any([business_id, nonce, timestamp, signature, appId]):
-            print('请检查query是否完整，或nonce的值是否为0')
+            print('请检查query是否完整，或nonce的值是否为0,signature是否为空')
             return False
         timestamp = timestamp[0]
-        if timestamp - int(time.time()) > 300:
+        if int(time.time()) - int(timestamp) > 300:
             print('超时了')
             return False
         signature = signature[0]
@@ -183,3 +183,4 @@ class ModerateClient(object):
         buff += self.secret_key
         result = hashlib.md5(buff.encode('utf8')).hexdigest()
         return result == signature
+
