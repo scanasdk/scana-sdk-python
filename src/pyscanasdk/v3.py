@@ -154,18 +154,23 @@ class ModerateClient(object):
         buff += self.secret_key
         return hashlib.md5(buff.encode('utf8')).hexdigest()
 
+    @staticmethod
+    def check_empty(lst):
+        return not any(not bool(item) for item in lst)
+
     def validate_signature_by_url(self, url):
         """生成签名信息
         Args: params url 回调地址
         Returns: 参数签名md5值
         """
+        if not url.startswith('http'):
+            url += 'https://www.baidu.com/?'
         query_dict = parse_qs(urlparse(url).query)
         business_id = query_dict.get('businessId', '[]')
         nonce = query_dict.get('nonce', [])
         timestamp = query_dict.get('timestamp', [])
-        appId = query_dict.get('appId', [])
         signature = query_dict.get('signature', [])
-        if not any([business_id, nonce, timestamp, signature, appId]):
+        if not self.check_empty([business_id, nonce, timestamp, signature]):
             print('请检查query是否完整，或nonce的值是否为0,signature是否为空')
             return False
         timestamp = timestamp[0]
@@ -183,4 +188,3 @@ class ModerateClient(object):
         buff += self.secret_key
         result = hashlib.md5(buff.encode('utf8')).hexdigest()
         return result == signature
-
