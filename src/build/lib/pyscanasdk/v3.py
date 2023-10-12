@@ -164,7 +164,7 @@ class ModerateClient(object):
         Returns: 参数签名md5值
         """
         if not url.startswith('http'):
-            url = 'https://www.baidu.com/?' + url
+            url += 'https://www.baidu.com/?'
         query_dict = parse_qs(urlparse(url).query)
         business_id = query_dict.get('businessId', '[]')
         nonce = query_dict.get('nonce', [])
