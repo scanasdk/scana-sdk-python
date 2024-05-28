@@ -1,4 +1,4 @@
-''# -*- coding: utf-8 -*-
+''  # -*- coding: utf-8 -*-
 from pyscanasdk.v3 import ModerateClient
 import uuid
 
@@ -9,6 +9,8 @@ img_business_id = 'xxxx'
 audio_business_id = 'xxxx'
 video_business_id = 'xxxx'
 doc_business_id = 'xxxx'
+url_business_id = 'xxxx'
+
 
 def gen_sign_by_url(url):
     mc = ModerateClient(app_id=app_id,  # 得到的appid
@@ -24,8 +26,10 @@ def gen_sign(business_id, timestamp, nonce):
                         secret_key=secret_key,  # 得到的秘钥
                         doc_business_id=doc_business_id)  # 文档的业务id
     # 生成signature  business_id为当前业务类型的id     timestamp：时间戳  nonce 随机数
-    sign = mc.gen_signature(business_id=business_id, timestamp=timestamp, nonce=nonce)
+    sign = mc.gen_signature(business_id=business_id,
+                            timestamp=timestamp, nonce=nonce)
     return sign
+
 
 def text_test():
     """
@@ -41,7 +45,8 @@ def text_test():
     resp = mc.text(content=content, ac=True)  # ac默认值为False 同步     为True时异步
     print(resp)
     # 生成signature  business_id为当前业务类型的id     timestamp：时间戳  nonce 随机数
-    sign = mc.gen_signature(business_id=text_business_id, timestamp=1615646461100, nonce=1)
+    sign = mc.gen_signature(business_id=text_business_id,
+                            timestamp=1615646461100, nonce=1)
     print(sign)
 
 
@@ -67,7 +72,8 @@ def img_test():
     resp = mc.image(content=content, ac=True)  # ac默认值为False 同步     为True时异步
     print(resp)
     # 生成signature  business_id为当前业务类型的id     timestamp：时间戳  nonce 随机数
-    sign = mc.gen_signature(business_id=img_business_id, timestamp=1615646461100, nonce=1)
+    sign = mc.gen_signature(business_id=img_business_id,
+                            timestamp=1615646461100, nonce=1)
     print(sign)
 
 
@@ -79,10 +85,11 @@ def video_test():
                         secret_key=secret_key,  # 得到的秘钥
                         video_business_id=video_business_id)  # 视频的业务id
     content = 'http://example.mp4'  # 待检测视频链接
-    resp = mc.video(content=content)
+    resp = mc.video(content=content, content_id='aaa')
     print(resp)
     # 生成signature  business_id为当前业务类型的id     timestamp：时间戳  nonce 随机数
-    sign = mc.gen_signature(business_id=video_business_id, timestamp=1615646461100, nonce=1)
+    sign = mc.gen_signature(business_id=video_business_id,
+                            timestamp=1615646461100, nonce=1)
     print(sign)
 
 
@@ -94,10 +101,11 @@ def audio_test():
                         secret_key=secret_key,  # 得到的秘钥
                         audio_business_id=audio_business_id)  # 音频的业务id
     content = 'http://example.mp4'  # 待检测音频链接
-    resp = mc.audio(content=content)
+    resp = mc.audio(content=content, content_id='aaa')
     print(resp)
     # 生成signature  business_id为当前业务类型的id     timestamp：时间戳  nonce 随机数
-    sign = mc.gen_signature(business_id=audio_business_id, timestamp=1615646461100, nonce=1)
+    sign = mc.gen_signature(business_id=audio_business_id,
+                            timestamp=1615646461100, nonce=1)
     print(sign)
 
 
@@ -109,19 +117,30 @@ def doc_test():
                         secret_key=secret_key,  # 得到的秘钥
                         doc_business_id=doc_business_id)  # 文档的业务id
     content = 'http://example.docx'  # 待检测文档链接
-    resp = mc.doc(content=content)
+    resp = mc.doc(content=content, content_id='aaa')
     print(resp)
     # 生成signature  business_id为当前业务类型的id     timestamp：时间戳  nonce 随机数
-    sign = mc.gen_signature(business_id=doc_business_id, timestamp=1615646461100, nonce=1)
+    sign = mc.gen_signature(business_id=doc_business_id,
+                            timestamp=1615646461100, nonce=1)
     print(sign)
 
 
+def url_test():
+    """
+    url检测 示例
+    """
+    mc = ModerateClient(app_id=app_id,  # 得到的appid
+                        secret_key=secret_key,  # 得到的秘钥
+                        url_business_id=url_business_id)  # 文档的业务id
+    content = 'https://example.com'  # 待检测文档链接
+    resp = mc.url(content=content, content_id='aaa')
+    print(resp)
 
 
 if __name__ == "__main__":
-
-    url = 'https://xxxx.xxx?businessId=111111111&nonce=1&timestamp=1611111111111&signature=xxxxxxx'
-    print(gen_sign_by_url(url))
+    url_test()
+    # url = 'https://xxxx.xxx?businessId=111111111&nonce=1&timestamp=1611111111111&signature=xxxxxxx'
+    # print(gen_sign_by_url(url))
     # pass
     # mc = ModerateClient(img_business_id='1800097935845781514', secret_key='a2f175a8-5373-11ed-9949-0242ac12000e',
     #                     app_id='62ac786311b92177337a933b'

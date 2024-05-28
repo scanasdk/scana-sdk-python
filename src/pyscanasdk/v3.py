@@ -8,7 +8,7 @@ from urllib.parse import urlparse, parse_qsl, parse_qs
 # https://packaging.python.org/en/latest/tutorials/packaging-projects/#creating-the-package-files
 class ModerateClient(object):
     def __init__(self, app_id, secret_key, text_business_id='', img_business_id='', audio_business_id='',
-                 video_business_id='', doc_business_id=''):
+                 video_business_id='', doc_business_id='', url_business_id=''):
         """
         :param app_id: 获取来的appid
         :param secret_key: 获取到的和appid对应的secret_key
@@ -22,6 +22,7 @@ class ModerateClient(object):
         self.audio_business_id = audio_business_id
         self.video_business_id = video_business_id
         self.doc_business_id = doc_business_id
+        self.url_business_id = url_business_id
 
     def text(self, content, ac=False, extra="", timeout=10):
         """
@@ -71,10 +72,11 @@ class ModerateClient(object):
         resp = requests.post(url=moderation_url, json=data, timeout=timeout)
         return resp.json()
 
-    def audio(self, content, extra="", timeout=10):
+    def audio(self, content, content_id, extra="", timeout=10):
         """
         图片审核的接口
         :param content: 待审核的音频
+        :param content_id: 内容id
         :param timeout: 超时时间，单位秒
         :param extra: 透传字段
         :return:
@@ -87,16 +89,18 @@ class ModerateClient(object):
             "appId": self.app_id,
             "secretKey": self.secret_key,
             "businessId": self.audio_business_id,
+            "contentId": content_id,
             "url": content,
             "extra": extra
         }
         resp = requests.post(url=moderation_url, json=data, timeout=timeout)
         return resp.json()
 
-    def video(self, content, extra="", timeout=10):
+    def video(self, content, content_id, extra="", timeout=10):
         """
         图片审核的接口
         :param content: 待审核的视频
+        :param content_id: 内容id
         :param timeout: 超时时间，单位秒
         :param extra: 透传字段
         :return:
@@ -109,16 +113,18 @@ class ModerateClient(object):
             "appId": self.app_id,
             "secretKey": self.secret_key,
             "businessId": self.video_business_id,
+            "contentId": content_id,
             "url": content,
             "extra": extra
         }
         resp = requests.post(url=moderation_url, json=data, timeout=timeout)
         return resp.json()
 
-    def doc(self, content, extra="", timeout=10):
+    def doc(self, content, content_id, extra="", timeout=10):
         """
         文档审核的接口
         :param content: 待审核的文档
+        :param content_id: 内容id
         :param timeout: 超时时间，单位秒
         :param extra: 透传字段
         :return:
@@ -131,6 +137,31 @@ class ModerateClient(object):
             "appId": self.app_id,
             "secretKey": self.secret_key,
             "businessId": self.doc_business_id,
+            "contentId": content_id,
+            "url": content,
+            "extra": extra
+        }
+        resp = requests.post(url=moderation_url, json=data, timeout=timeout)
+        return resp.json()
+
+    def url(self, content, content_id, extra="", timeout=10):
+        """
+        图片审核的接口
+        :param content_id: 内容id
+        :param content: 待审核的url
+        :param timeout: 超时时间，单位秒
+        :param extra: 透传字段
+        :return:
+        """
+        if not self.url_business_id:
+            return {"msg": "url_business_id不能为空!"}
+        async_url = "https://newkmsapi.qixincha.com/kms-open/v3/url/async"
+        moderation_url = async_url
+        data = {
+            "appId": self.app_id,
+            "secretKey": self.secret_key,
+            "businessId": self.url_business_id,
+            "contentId": content_id,
             "url": content,
             "extra": extra
         }
@@ -147,7 +178,8 @@ class ModerateClient(object):
         if not any([business_id, timestamp, nonce]):
             print('businessId,timestamp,nonce不能为空！')
             return ''
-        params = {"nonce": nonce, "timestamp": timestamp, 'businessId': business_id}
+        params = {"nonce": nonce, "timestamp": timestamp,
+                  'businessId': business_id}
         buff = ""
         for k in sorted(params.keys()):
             buff += str(k) + str(params[k])
